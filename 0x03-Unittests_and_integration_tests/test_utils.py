@@ -3,6 +3,7 @@
     Test for access_nested map
 """
 import unittest
+from unittest.mock import patch, MagicMock
 from parameterized import parameterized
 from typing import (
     Mapping,
@@ -11,7 +12,8 @@ from typing import (
     Dict,
     Callable,
 )
-from utils import access_nested_map
+import requests
+from utils import access_nested_map, get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -40,6 +42,27 @@ class TestAccessNestedMap(unittest.TestCase):
         
         with self.assertRaises(KeyError):
             self.assertEqual(access_nested_map(nested_map, path), expected)
+
+
+class TestGetJson(unittest.TestCase):
+    """
+    Class to test get_json function
+    """
+    
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False})
+    ])
+    @patch("requests.get")
+    def test_get_json(self,
+                      test_url: str,
+                      test_payload: dict,
+                      mock_response) -> None:
+        mock_response.return_value.json.return_value = test_payload
+        result = get_json(test_url)
+        self.assertEqual(result, test_payload)
+        #mock_response.assert_called_once_with(test_url)
+
 
 
 if __name__ == '__main__':
