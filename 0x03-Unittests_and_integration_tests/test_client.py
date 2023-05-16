@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+'''
+Test client
+'''
 import unittest
 import client
 from unittest.mock import patch, PropertyMock
@@ -8,6 +11,7 @@ import client
 from client import GithubOrgClient
 from fixtures import TEST_PAYLOAD
 
+
 class TestGithubOrgClient(unittest.TestCase):
     """
     Test the Githuborgcliemt class methods
@@ -15,7 +19,7 @@ class TestGithubOrgClient(unittest.TestCase):
 
     @parameterized.expand([
         ("google"),
-        ("abc")   
+        ("abc")
     ])
     @patch('client.get_json', return_value={"payload": True})
     def test_org(self, org, mock_org):
@@ -27,7 +31,7 @@ class TestGithubOrgClient(unittest.TestCase):
         testResponse = orgTest.org
         self.assertEqual(testResponse, mock_org.return_value)
         mock_org.assert_called_once()
-    
+
     @patch('client.get_json', return_value=[{'name': 'Holberton'},
                                             {'name': '89'},
                                             {'name': 'alx'}])
@@ -46,9 +50,7 @@ class TestGithubOrgClient(unittest.TestCase):
                 self.assertIn(mock_repo.return_value[idx]['name'], test_repo)
             mock_repo.assert_called_once()
             m.assert_called_once()
-         
 
-   
     @parameterized.expand([
         ({"license": {"key": "my_license"}}, "my_license", True),
         ({"license": {"key": "other_license"}}, "my_license", False)
@@ -64,7 +66,8 @@ class TestGithubOrgClient(unittest.TestCase):
         github_client = client.GithubOrgClient('holberton')
         license_available = github_client.has_license(repo, license_key)
         self.assertEqual(license_available, expected)
-    
+
+
 def requests_get(*args, **kwargs):
     """
     Function that mocks requests.get function
@@ -99,7 +102,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """
-        Set up the test environment for the TestIntegrationGithubOrgClient class
+        Set up the test environment for the
+        TestIntegrationGithubOrgClient class
         """
         cls.get_patcher = patch('utils.requests.get', side_effect=requests_get)
         cls.get_patcher.start()
@@ -124,6 +128,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """
         self.assertEqual(
             self.client.public_repos(license="apache-2.0"),
-            self.apache2_repos)   
+            self.apache2_repos)
     if __name__ == "__main__":
         unittest.main()
