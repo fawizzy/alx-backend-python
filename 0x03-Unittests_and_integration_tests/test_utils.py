@@ -19,14 +19,22 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
         ({"a": {"b": 2}}, ("a", "b"), 2),
     ])
-    def test_access_nested_map(self, nested_map: Mapping, path: Sequence, expected: int) -> None:
+    def test_access_nested_map(self,
+                               nested_map: Mapping,
+                               path: Sequence, expected: int) -> None:
+        """test access nested map"""
         self.assertEqual(access_nested_map(nested_map, path), expected)
+
     @parameterized.expand([
         ({"a": 1}, ("b",), KeyError),
         ({"a": {"b": 2}}, ("b",), KeyError),
         ({"a": {"b": 2}}, ("b", "b"), KeyError),
     ])
-    def test_access_nested_map_exception(self, nested_map: Mapping, path: Sequence, expected: int) -> None:
+    def test_access_nested_map_exception(self,
+                                         nested_map: Mapping,
+                                         path: Sequence,
+                                         expected: int) -> None:
+        """test access nested map exception"""
         with self.assertRaises(KeyError):
             self.assertEqual(access_nested_map(nested_map, path), expected)
 
@@ -62,8 +70,7 @@ class TestMemoize(unittest.TestCase):
             @memoize
             def a_property(self):
                 return self.a_method()
-        
-        
+
         @patch('TestClass.a_method')
         def test_memoize(self, mock_a_method):
             # Mock the a_method
@@ -81,7 +88,6 @@ class TestMemoize(unittest.TestCase):
 
             # Assert that the results are equal
             self.assertEqual(result1, result2)
-
 
 
 if __name__ == "__main__":
