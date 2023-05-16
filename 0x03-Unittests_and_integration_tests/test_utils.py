@@ -1,69 +1,88 @@
 #!/usr/bin/env python3
 """
-    Test for access_nested map
+test utils
 """
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, Mock
+from typing import Mapping, Sequence
 from parameterized import parameterized
-from typing import (
-    Mapping,
-    Sequence,
-    Any,
-    Dict,
-    Callable,
-)
 import requests
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 
 
 class TestAccessNestedMap(unittest.TestCase):
     """
-    Test class for utils.access_nested_map
+    Test sccess_nested_map
     """
-
     @parameterized.expand([
         ({"a": 1}, ("a",), 1),
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
         ({"a": {"b": 2}}, ("a", "b"), 2),
     ])
-    def test_access_nested_map(self,
-                               nested_map: Mapping,
-                               path: Sequence, expected: int) -> None:
+    def test_access_nested_map(self, nested_map: Mapping, path: Sequence, expected: int) -> None:
         self.assertEqual(access_nested_map(nested_map, path), expected)
- 
     @parameterized.expand([
-        ({}, ("a"), None),
-        ({"a": 1}, {"a", "b"}, None),
+        ({"a": 1}, ("b",), KeyError),
+        ({"a": {"b": 2}}, ("b",), KeyError),
+        ({"a": {"b": 2}}, ("b", "b"), KeyError),
     ])
-    def test_access_nested_map_exception(self,
-                                         nested_map: Mapping,
-                                         path: Sequence,
-                                         expected: int) -> None:
-        
+    def test_access_nested_map_exception(self, nested_map: Mapping, path: Sequence, expected: int) -> None:
         with self.assertRaises(KeyError):
             self.assertEqual(access_nested_map(nested_map, path), expected)
 
 
 class TestGetJson(unittest.TestCase):
     """
-    Class to test get_json function
+    class TestGetJson
     """
-    
     @parameterized.expand([
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False})
     ])
-    @patch("requests.get")
-    def test_get_json(self,
-                      test_url: str,
-                      test_payload: dict,
-                      mock_response) -> None:
-        mock_response.return_value.json.return_value = test_payload
-        result = get_json(test_url)
-        self.assertEqual(result, test_payload)
-        #mock_response.assert_called_once_with(test_url)
+    @patch('requests.get')
+    def test_get_json(self, url: str, payload: dict, mock_get):
+        """
+        test get json
+        """
+        response = Mock()
+        response.json.return_value = payload
+        mock_get.return_value = response
+        self.assertEqual(get_json(url), payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """TestMemoize
+    """
+    def test_memoize(self):
+        class TestClass:
+
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+        
+        
+        @patch('TestClass.a_method')
+        def test_memoize(self, mock_a_method):
+            # Mock the a_method
+            mock_a_method.return_value = 42
+
+            # Create an instance of TestClass
+            instance = self.TestClass()
+
+            # Call a_property twice
+            result1 = instance.a_property()
+            result2 = instance.a_property()
+
+            # Assert that a_method was called once
+            mock_a_method.assert_called_once()
+
+            # Assert that the results are equal
+            self.assertEqual(result1, result2)
 
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
