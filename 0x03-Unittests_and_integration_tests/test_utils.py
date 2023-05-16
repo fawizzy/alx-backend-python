@@ -62,21 +62,28 @@ class TestMemoize(unittest.TestCase):
     """TestMemoize
     """
     def test_memoize(self):
+        """test memoize"""
         class TestClass:
 
             def a_method(self):
+                """
+                a sample method
+                """
                 return 42
 
             @memoize
             def a_property(self):
+                """
+                a sample property
+                """
                 return self.a_method()
 
         @patch('TestClass.a_method')
         def test_memoize(self, mock_a_method):
-            # Mock the a_method
+            """Mock the a_method"""
             mock_a_method.return_value = 42
 
-            # Create an instance of TestClass
+            """Create an instance of TestClass"""
             instance = self.TestClass()
 
             # Call a_property twice
